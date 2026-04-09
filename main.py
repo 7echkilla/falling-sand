@@ -58,6 +58,7 @@ def fetch_contributions(username, token):
 
 import os
 import tempfile
+import tqdm
 import matplotlib.pyplot as plt
 import imageio.v2 as imageio
 
@@ -71,7 +72,8 @@ def generate_gif(dataframe, output_file="falling_sand.gif"):
     images = []
 
     with tempfile.TemporaryDirectory() as temporary_dirname:
-        for i in range(1, len(dataframe) + 1):
+        # Display progress bar for frames generation
+        for i in tqdm.tqdm(range(1, len(dataframe) + 1), desc="Generating frames"):
             figure, axes = plt.subplots(figsize=(10, 3))
             subset = dataframe.iloc[:i]
             axes.bar(subset['date'], subset['count'], color='green')
