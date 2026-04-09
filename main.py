@@ -56,6 +56,8 @@ def fetch_contributions(username, token):
     
     return dataframe
 
+import os
+import tempfile
 import matplotlib.pyplot as plt
 import imageio.v2 as imageio
 
@@ -68,21 +70,22 @@ def generate_gif(dataframe, output_file="falling_sand.gif"):
     max_count = dataframe['count'].max()
     images = []
 
-    for i in range(1, len(dataframe) + 1):
-        figure, axes = plt.subplots(figsize=(10, 3))
-        subset = dataframe.iloc[:i]
-        axes.bar(subset['date'], subset['count'], color='green')
-        axes.set_ylim(0, max_count + 1)
-        axes.set_xlabel("Date")
-        axes.set_ylabel("Contributions")
-        axes.set_title("GitHub Contributions over Time")
-        figure.tight_layout()
+    with tempfile.TemporaryDirectory() as temporary_dirname:
+        for i in range(1, len(dataframe) + 1):
+            figure, axes = plt.subplots(figsize=(10, 3))
+            subset = dataframe.iloc[:i]
+            axes.bar(subset['date'], subset['count'], color='green')
+            axes.set_ylim(0, max_count + 1)
+            axes.set_xlabel("Date")
+            axes.set_ylabel("Contributions")
+            axes.set_title("GitHub Contributions over Time")
+            figure.tight_layout()
 
-        # Save frame to a temporary file
-        frame_path = f"frame_{i}.png"
-        plt.savefig(frame_path)
-        plt.close(figure)
-        images.append(imageio.imread(frame_path))
+            # Save frame to a temporary file
+            frame_path = os.path.join(temporary_dirname, f"frame_{i}.png")
+            plt.savefig(frame_path)
+            plt.close(figure)
+            images.append(imageio.imread(frame_path))
 
     # Create GIF
     imageio.mimsave(output_file, images, duration=0.1)
