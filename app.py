@@ -25,11 +25,12 @@ def favicon():
 # Redirect to GitHub for OAuth
 @app.route("/login")
 def login():
+    redirect_uri = request.url_root + "callback"
     auth_url = (
         f"https://github.com/login/oauth/authorize"
         f"?client_id={CLIENT_ID}"
         f"&scope=read:user"
-        f"&redirect_uri=http://127.0.0.1:5000/callback"
+        f"&redirect_uri={redirect_uri}"
     )
 
     return redirect(auth_url)
