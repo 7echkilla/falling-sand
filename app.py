@@ -134,7 +134,8 @@ def dynamic_gif():
     gif_bytes = generate_gif_bytes(days)
 
     response = send_file(gif_bytes, mimetype="image/gif")
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Content-Type"] = "image/gif"
     return response
 
 from PIL import Image, ImageDraw
