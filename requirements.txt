@@ -1,5 +1,5 @@
+flask
 requests
-matplotlib
-imageio
 pandas
-tqdm
+python-dotenv
+Pillow

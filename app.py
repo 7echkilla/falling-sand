@@ -2,6 +2,9 @@ import io
 import os
 import requests
 
+# from dotenv import load_dotenv
+# load_dotenv("config.env")
+
 from flask import Flask, redirect, request, send_from_directory, send_file
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
