@@ -1,6 +1,6 @@
 import requests
 
-def get_token(authorisation_code, client_id, client_secret):
+def code_to_token(authorisation_code, client_id, client_secret):
     """
     Convert temporary login code to usable API token 
     """
