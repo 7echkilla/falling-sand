@@ -1,6 +1,6 @@
-from flask import Blueprint, request, send_file, jsonify, redirect
+from flask import Blueprint, request, send_file, jsonify, redirect, render_template
 from app import config
-from app.github import fetch_contributions, get_username, get_token, render_template
+from app.github import fetch_contributions, get_username, get_token
 from app.gif import generate_gif_bytes
 from app.db import get_token, save_user
 
