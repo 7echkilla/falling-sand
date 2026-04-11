@@ -1,7 +1,5 @@
 from app import create_app
-from app.db import init_db
 
-init_db()           # Initialise database to store valid users
 app = create_app()
 
 if __name__ == "__main__":
