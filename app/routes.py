@@ -60,9 +60,14 @@ def callback():
 def gif():
     # Fetch parameters from: /gif?username=abc&key=123
     username = request.args.get("username")
+    token = request.args.get("token")
 
-    if (not username):
-        return jsonify({"error": "Missing username"}), 400
+    if (not username or not token):
+        return jsonify({"error": "Missing parameters"}), 400
+
+    # Prevent abuse of API by unauthorised users
+    if (not verify_signed_token(username, token)):
+        return jsonify({"error": "Unauthorised"}), 403
 
     # Serve from cache (if available)
     if (username in cache):
