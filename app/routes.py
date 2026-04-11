@@ -3,6 +3,7 @@ from app import config
 from app.github import fetch_contributions, get_username, code_to_token
 from app.gif import generate_gif_bytes
 from app.db import get_access_token, save_user
+from app.auth import generate_signed_token, verify_signed_token
 
 main = Blueprint("main", __name__)  # Organise routes into a module
 
@@ -41,23 +42,28 @@ def callback():
     username = get_username(access_token)
     save_user(username, access_token)
 
+    signed_token = generate_signed_token(username)
+
     return render_template(
         "success.html",
         username=username,
         url_root=request.url_root,
-        gif_secret=config.GIF_SECRET
+        token=signed_token
     )
 
 @main.route("/gif")
 def gif():
     # Fetch parameters from: /gif?username=abc&key=123
     username = request.args.get("username")
-    key = request.args.get("key")
+    token = request.args.get("token")
+
+    if (not username or not token):
+        return jsonify({"error": "Missing parameters"}), 400
 
     # Prevent abuse of API by unauthorised users
-    if (key != config.GIF_SECRET):
-        return jsonify({"error": "Unauthorized"}), 403
-
+    if (not verify_signed_token(username, token)):
+        return jsonify({"error": "Unauthorised"}), 403
+        
     # Reject non-logged in users
     access_token = get_access_token(username)
     if (not access_token):
