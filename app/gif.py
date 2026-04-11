@@ -45,5 +45,4 @@ def generate_gif_bytes(days):
         loop=0
     )
 
-    gif_io.seek(0)
-    return gif_io
+    return gif_io.getvalue()

@@ -1,6 +1,6 @@
 import time
 
-from flask import Blueprint, request, send_file, jsonify, redirect, render_template
+from flask import Blueprint, request, send_file, jsonify, redirect, render_template, Response
 from app import config
 from app.github import fetch_contributions, get_username, code_to_token
 from app.gif import generate_gif_bytes
@@ -61,12 +61,14 @@ def gif():
     # Fetch parameters from: /gif?username=abc&key=123
     username = request.args.get("username")
 
-    # Serve from cache if available
+    if (not username):
+        return jsonify({"error": "Missing username"}), 400
+
+    # Serve from cache (if available)
     if (username in cache):
         gif_bytes, timestamp = cache[username]
         if (time.time() - timestamp < CACHE_TTL):
-            gif_bytes.seek(0)
-            return send_file(gif_bytes, mimetype="image/gif")
+            return Response(gif_bytes, mimetype="image/gif")
         
     # Reject non-logged in users
     access_token = get_access_token(username)
@@ -78,5 +80,4 @@ def gif():
     gif_bytes = generate_gif_bytes(days)
     cache[username] = (gif_bytes, time.time())  # Store in cache
 
-    gif_bytes.seek(0)
-    return send_file(gif_bytes, mimetype="image/gif")
+    return Response(gif_bytes, mimetype="image/gif")
