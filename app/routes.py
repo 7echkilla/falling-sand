@@ -25,20 +25,49 @@ def login():
 
 @main.route("/callback")
 def callback():
-    authorisation_code = request.args.get("code")   # Temporary code sent by GitHub as proof
+    # authorisation_code = request.args.get("code")   # Temporary code sent by GitHub as proof
 
-    # Exchange code for access token
-    access_token = get_token(
-        authorisation_code,
-        config.CLIENT_ID,
-        config.CLIENT_SECRET
-    )
+    # # Exchange code for access token
+    # access_token = get_token(ode")   # Temporary code sent by GitHub as proof
 
-    # Store user to avoid recurring login
-    username = get_username(access_token)
-    save_user(username, access_token)
+    # # Exchange code for access token
+    # access_token = get_token(
+    #     authorisation_code,
+    #     config.CLIENT_ID,
+    #     config.CLIENT_SECRET
+    # )
 
-    return render_template("success.html", username=username, url_root=request.url_root)
+    # # Store user to avoid recurring login
+    # username = get_username(access_token)
+    # save_user(username, access_token)
+
+    # return render_template("success.html", username=username, url_root=request.url_root)
+    #     authorisation_code,
+    #     config.CLIENT_ID,
+    #     config.CLIENT_SECRET
+    # )
+
+    # # Store user to avoid recurring login
+    # username = get_username(access_token)
+    # save_user(username, access_token)
+
+    # return render_template("success.html", username=username, url_root=request.url_root)
+    try:
+        code = request.args.get("code")
+
+        token = get_token(
+            code,
+            config.CLIENT_ID,
+            config.CLIENT_SECRET
+        )
+
+        username = get_username(token)
+        save_user(username, token)
+
+        return f"Success {username}"
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @main.route("/gif")
 def gif():
