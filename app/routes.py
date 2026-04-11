@@ -1,3 +1,5 @@
+import time
+
 from flask import Blueprint, request, send_file, jsonify, redirect, render_template
 from app import config
 from app.github import fetch_contributions, get_username, code_to_token
@@ -6,6 +8,9 @@ from app.db import get_access_token, save_user
 from app.auth import generate_signed_token, verify_signed_token
 
 main = Blueprint("main", __name__)  # Organise routes into a module
+
+cache = {}
+CACHE_TTL = 300 # 5 minutes
 
 @main.route("/")
 def home():
@@ -55,21 +60,23 @@ def callback():
 def gif():
     # Fetch parameters from: /gif?username=abc&key=123
     username = request.args.get("username")
-    # token = request.args.get("token")
 
-    # if (not username or not token):
-    #     return jsonify({"error": "Missing parameters"}), 400
-
-    # Prevent abuse of API by unauthorised users
-    # if (not verify_signed_token(username, token)):
-    #     return jsonify({"error": "Unauthorised"}), 403
+    # Serve from cache if available
+    if (username in cache):
+        gif_bytes, timestamp = cache[username]
+        if (time.time() - timestamp < CACHE_TTL):
+            gif_bytes.seek(0)
+            return send_file(gif_bytes, mimetype="image/gif")
         
     # Reject non-logged in users
     access_token = get_access_token(username)
     if (not access_token):
         return jsonify({"error": "User not logged in"}), 401
 
+    # Slow part on occasional runs
     days = fetch_contributions(username, access_token)
     gif_bytes = generate_gif_bytes(days)
+    cache[username] = (gif_bytes, time.time())  # Store in cache
 
-    return send_file(gif_bytes, mimetype="image/gif", as_attachment=False)
+    gif_bytes.seek(0)
+    return send_file(gif_bytes, mimetype="image/gif")
