@@ -55,14 +55,14 @@ def callback():
 def gif():
     # Fetch parameters from: /gif?username=abc&key=123
     username = request.args.get("username")
-    token = request.args.get("token")
+    # token = request.args.get("token")
 
-    if (not username or not token):
-        return jsonify({"error": "Missing parameters"}), 400
+    # if (not username or not token):
+    #     return jsonify({"error": "Missing parameters"}), 400
 
     # Prevent abuse of API by unauthorised users
-    if (not verify_signed_token(username, token)):
-        return jsonify({"error": "Unauthorised"}), 403
+    # if (not verify_signed_token(username, token)):
+    #     return jsonify({"error": "Unauthorised"}), 403
         
     # Reject non-logged in users
     access_token = get_access_token(username)
@@ -72,4 +72,4 @@ def gif():
     days = fetch_contributions(username, access_token)
     gif_bytes = generate_gif_bytes(days)
 
-    return send_file(gif_bytes, mimetype="image/gif")
+    return send_file(gif_bytes, mimetype="image/gif", as_attachment=False)
