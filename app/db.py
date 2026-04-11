@@ -29,7 +29,7 @@ def save_user(username, token):
     connection.commit()                     # Insert new if user doesn't exist, replace if user already exists
     connection.close()
 
-def get_token(username):
+def get_access_token(username):
     """
     Return token if user exists in database; else None
     """

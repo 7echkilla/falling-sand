@@ -2,7 +2,7 @@ from flask import Blueprint, request, send_file, jsonify, redirect, render_templ
 from app import config
 from app.github import fetch_contributions, get_username, code_to_token
 from app.gif import generate_gif_bytes
-from app.db import get_token, save_user
+from app.db import get_access_token, save_user
 
 main = Blueprint("main", __name__)  # Organise routes into a module
 
@@ -27,6 +27,9 @@ def login():
 def callback():
     authorisation_code = request.args.get("code")   # Temporary code sent by GitHub as proof
 
+    if (not authorisation_code):
+        return jsonify({"error": "Missing code"}), 400
+    
     # Exchange code for access token
     access_token = code_to_token(
         authorisation_code,
@@ -38,7 +41,12 @@ def callback():
     username = get_username(access_token)
     save_user(username, access_token)
 
-    return render_template("success.html", username=username, url_root=request.url_root)
+    return render_template(
+        "success.html",
+        username=username,
+        url_root=request.url_root,
+        gif_secret=config.GIF_SECRET
+    )
 
 @main.route("/gif")
 def gif():
@@ -51,7 +59,7 @@ def gif():
         return jsonify({"error": "Unauthorized"}), 403
 
     # Reject non-logged in users
-    access_token = get_token(username)
+    access_token = get_access_token(username)
     if (not access_token):
         return jsonify({"error": "User not logged in"}), 401
 
