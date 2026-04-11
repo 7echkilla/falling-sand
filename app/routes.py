@@ -73,7 +73,7 @@ def gif():
     if (username in cache):
         gif_bytes, timestamp = cache[username]
         if (time.time() - timestamp < CACHE_TTL):
-            return Response(gif_bytes, mimetype="image/gif")
+            return Response(gif_bytes, mimetype="image/gif", headers={"Cache-Control": "public, max-age=300"})
         
     # Reject non-logged in users
     access_token = get_access_token(username)
@@ -85,4 +85,4 @@ def gif():
     gif_bytes = generate_gif_bytes(days)
     cache[username] = (gif_bytes, time.time())  # Store in cache
 
-    return Response(gif_bytes, mimetype="image/gif")
+    return Response(gif_bytes, mimetype="image/gif", headers={"Cache-Control": "public, max-age=300"})
