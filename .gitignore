@@ -1,20 +1,13 @@
-# Virtual Environments
+# Virtual environment
 .venv/
-venv/
-env/
 
-# Python Bytecode
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Distribution
-build/
-dist/
-*.egg-info/
-.eggs/
-pip-wheel-metadata/
 
-# Output File
+# Project specific files
 *.gif
 *.env
+*.db
